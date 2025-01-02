@@ -4,7 +4,7 @@ const cors = require("cors");
 const Book = require("./models/book.model.js");
 const User = require("./models/user.model.js");
 const e = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const app = express();
 require("dotenv").config();
 
