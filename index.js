@@ -355,7 +355,16 @@ app.delete("/api/users/:userId/friends/:friendId", async (req, res) => {
 app.get("/api/users/:id", async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findById(userId).populate("books");
+    const user = await User.findById(userId)
+      .populate({
+        path: "books", // Populate books for the user
+      })
+      .populate({
+        path: "friends", // Populate friends
+        populate: {
+          path: "books", // Populate books for each friend
+        },
+      });
 
     if (!user) {
       return res.status(404).json({ message: "User doesn't exist" });
@@ -364,6 +373,10 @@ app.get("/api/users/:id", async (req, res) => {
     const userData = {
       name: user.fullname,
       books: user.books,
+      friends: user.friends.map((friend) => ({
+        name: friend.fullname,
+        books: friend.books,
+      })),
     };
 
     return res.status(200).json({ user: userData });
