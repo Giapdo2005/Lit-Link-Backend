@@ -371,6 +371,7 @@ app.get("/api/users/:id", async (req, res) => {
     }
 
     const userData = {
+      id: user._id,
       name: user.fullname,
       books: user.books,
       friends: user.friends.map((friend) => ({
