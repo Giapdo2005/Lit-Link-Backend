@@ -414,6 +414,21 @@ app.get("/api/users/friends/books/:id", async (req, res) => {
   }
 });
 
+app.get("/api/search-user", async (req, res) => {
+  const query = req.query.q;
+
+  try {
+    const users = await User.find({
+      fullname: { $regex: query, $options: "i" }, // Case-insensitive search
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 mongoose
