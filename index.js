@@ -414,7 +414,7 @@ app.get("/api/users/friends/books/:id", async (req, res) => {
   }
 });
 
-app.get("/api/search-user", async (req, res) => {
+app.get("/api/search-users", async (req, res) => {
   const query = req.query.q;
 
   try {
