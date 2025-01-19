@@ -253,10 +253,14 @@ app.put("/api/users/:userId/books/:bookId", async (req, res) => {
   const { userId, bookId } = req.params;
   const { read } = req.body;
 
+  if (![0, 1, 2].includes(read)) {
+    return res.status(400).json({ message: "Invalid read status" });
+  }
+
   try {
     const user = await User.findById(userId);
 
-    if (!userId) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -265,13 +269,21 @@ app.put("/api/users/:userId/books/:bookId", async (req, res) => {
     );
 
     if (bookIndex === -1) {
-      return res.status(404).json({ message: "book not found" });
+      return res
+        .status(404)
+        .json({ message: "Book not found in user's books" });
     }
 
-    user.books[bookIndex].read = read;
-    await user.save();
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, "books._id": bookId }, // Match the user and book by their ids
+      { $set: { "books.$.read": read } }, // Update the read status
+      { new: true } // Return the updated user document
+    ).populate("books");
 
-    return res.status(200).json({ message: `bookStatus: ${read}` });
+    return res.status(200).json({
+      message: `Book status updated to: ${read}`,
+      updatedUser: updatedUser.books, // Return the populated books
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
